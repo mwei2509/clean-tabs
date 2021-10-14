@@ -1,9 +1,9 @@
 # CONSOLIDATE YA TABS :cowboy_hat_face:
 
 
-:doughnut: remove duplicate tabs
-:boom: option to consolidate windows
-:scream: option to group tabs
+- :doughnut: remove duplicate tabs
+- :boom: option to consolidate windows
+- :scream: option to group tabs
 
 ## Try it out
 
