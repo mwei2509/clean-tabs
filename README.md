@@ -1,5 +1,6 @@
 # CONSOLIDATE YA TABS :cowboy_hat_face:
 
+![alt text](https://github.com/mwei2509/clean-tabs/blob/master/images/readme.png)
 
 - :doughnut: remove duplicate tabs
 - :boom: option to consolidate windows
