@@ -3,10 +3,8 @@
   "description": "Reduces all tabs with the same url into one tab",
   "version": "1.0",
   "manifest_version": 3,
-  "background": {
-    "service_worker": "background.js"
-  },
-  "permissions": ["storage", "activeTab", "tabs", "scripting"],
+  "background": {},
+  "permissions": ["tabs"],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {

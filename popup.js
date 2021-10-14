@@ -3,15 +3,14 @@ const ignoreUrlParamsButton = document.getElementById('ignoreUrlParams');
 const consolidateWindowsButton = document.getElementById('consolidateWindows');
 const groupTabsButton = document.getElementById('groupTabs');
 
-consolidateTabButton.addEventListener('click', async () => consolidateTabs());
+consolidateTabButton.addEventListener('click', consolidateTabs);
 
 async function consolidateTabs() {
-  console.log(ignoreUrlParamsButton.checked);
-
   const windows = await chrome.windows.getAll();
   const currentWindow = await chrome.windows.getCurrent();
 
   let tabs = [];
+  // if consolidating windows, collect tabs from all windows
   if (consolidateWindowsButton.checked) {
     for (const window of windows) {
       const windowTabs = await chrome.tabs.query({ windowId: window.id });
@@ -20,8 +19,6 @@ async function consolidateTabs() {
   } else {
     tabs = await chrome.tabs.query({ currentWindow: true });
   }
-
-  console.log(tabs);
 
   // best is active and last
   let tabsToClose = [];
@@ -47,7 +44,7 @@ async function consolidateTabs() {
     }
   }
 
-  // move windows
+  // remove duplicate tabs
   await chrome.tabs.remove(tabsToClose);
 
   if (groupTabsButton.checked) {
@@ -60,34 +57,23 @@ async function consolidateTabs() {
       }))
       .sort((a,b) => (a.domain > b.domain) ? 1 : ((b.domain > a.domain) ? -1 : 0));
 
-      sortedTabs.forEach(async (tab, index) => {
-        chrome.tabs.move([tab.id], { windowId: currentWindow.id, index });
-      })
+    sortedTabs.forEach(async (tab, index) => {
+      chrome.tabs.move([tab.id], { windowId: currentWindow.id, index });
+    })
 
-      await chrome.tabs.move(sortedTabs, { windowId: currentWindow.id, index: -1 });
+    await chrome.tabs.move(sortedTabs, { windowId: currentWindow.id, index: -1 });
   } else {
     const tabsToMove = Object.values(urlMap)
       .filter(tab => tab.windowId !== currentWindow.id)
       .map(tab => tab.id);
-    await chrome.tabs.move(tabsToMove, { windowId: currentWindow.id, index: -1 });
+
+    if (tabsToMove.length) {
+      await chrome.tabs.move(tabsToMove, { windowId: currentWindow.id, index: -1 });
+    }
   }
 }
 
-function getDomain (url) {
-  let domain;
-
-  domain = url.split('://')[1];
-  domain = domain.split('/')[0];
-
-  return domain;
-}
-
-function compare(a, b) {
-  if ( a.domain < b.domain ){
-    return -1;
-  }
-  if ( a.domain > b.domain ){
-    return 1;
-  }
-  return 0;
+function getDomain(url) {
+  let domain = url.split('://')[1];
+  return domain.split('/')[0];
 }
