@@ -1,0 +1,14 @@
+button {
+  border-radius: 5px;
+  width: 200px;
+  background-color: #eeeeee;
+}
+
+div#wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+div.input-wrapper {
+  margin-bottom: 5px;
+}
