@@ -15,3 +15,4 @@ This is an unpublished / unpackaged extension.  To try it out, you have to have 
 3. Click `Load unpacked` and select the repo folder
 4. Pin it to your extensions bar
 
+![alt text](https://github.com/mwei2509/clean-tabs/blob/master/images/screenrecording.gif)
