@@ -1,6 +1,7 @@
 const consolidateTabButton = document.getElementById('consolidateTabs');
 const ignoreUrlParamsButton = document.getElementById('ignoreUrlParams');
 const consolidateWindowsButton = document.getElementById('consolidateWindows');
+const groupTabsButton = document.getElementById('groupTabs');
 
 consolidateTabButton.addEventListener('click', async () => consolidateTabs());
 
@@ -47,10 +48,46 @@ async function consolidateTabs() {
   }
 
   // move windows
-  const tabsToMove = Object.values(urlMap)
-    .filter(tab => tab.windowId !== currentWindow.id)
-    .map(tab => tab.id);
-
   await chrome.tabs.remove(tabsToClose);
-  await chrome.tabs.move(tabsToMove, { windowId: currentWindow.id, index: -1 });
+
+  if (groupTabsButton.checked) {
+    // sort tabs by domain
+    const sortedTabs = Object.values(urlMap)
+      .map(tab => ({
+        windowId: tab.windowId,
+        id: tab.id,
+        domain: getDomain(tab.url)
+      }))
+      .sort((a,b) => (a.domain > b.domain) ? 1 : ((b.domain > a.domain) ? -1 : 0));
+
+      sortedTabs.forEach(async (tab, index) => {
+        chrome.tabs.move([tab.id], { windowId: currentWindow.id, index });
+      })
+
+      await chrome.tabs.move(sortedTabs, { windowId: currentWindow.id, index: -1 });
+  } else {
+    const tabsToMove = Object.values(urlMap)
+      .filter(tab => tab.windowId !== currentWindow.id)
+      .map(tab => tab.id);
+    await chrome.tabs.move(tabsToMove, { windowId: currentWindow.id, index: -1 });
+  }
+}
+
+function getDomain (url) {
+  let domain;
+
+  domain = url.split('://')[1];
+  domain = domain.split('/')[0];
+
+  return domain;
+}
+
+function compare(a, b) {
+  if ( a.domain < b.domain ){
+    return -1;
+  }
+  if ( a.domain > b.domain ){
+    return 1;
+  }
+  return 0;
 }
